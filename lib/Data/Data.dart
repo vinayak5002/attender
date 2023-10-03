@@ -20,6 +20,18 @@ class Data extends ChangeNotifier {
     storeData();
   }
 
+  void addClass(String name, int numStudents){
+    classes.add(Class(name: name, numStudents: numStudents));
+    notifyListeners();
+    storeData();
+  }
+
+  void deleteClass(String name){
+    classes.removeWhere((e) => e.name == name);
+    notifyListeners();
+    storeData();
+  }
+
   void loadData() async {
       
     SharedPreferences pref = await SharedPreferences.getInstance();
