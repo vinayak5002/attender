@@ -1,6 +1,7 @@
 import 'package:attender/Pages/ShowAttendancePage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../Data/Data.dart';
@@ -38,43 +39,67 @@ class _ClassPageState extends State<ClassPage> {
     );
   }
 
+  String _beautifyDateTime(DateTime dateTime) {
+  final now = DateTime.now();
+
+  // Calculate the difference in days
+  final difference = now.difference(dateTime);
+
+  if (difference.inDays == 0) {
+    // Today
+    return '${DateFormat('yMMMMd').format(dateTime)} (Today)';
+  } else if (difference.inDays == 1) {
+    // Yesterday
+    return 'Yesterday';
+  } else if (difference.inDays < 7) {
+    // Within the last week
+    return DateFormat('EEEE').format(dateTime); // Format as day of the week
+  } else {
+    // More than a week ago
+    return DateFormat('yMMMMd').format(dateTime); // Format as full date
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     Class _class = Provider.of<Data>(context).classes[widget.classIndex];
 
+    List<DateTime> sortedDates = _class.attendance?.keys.toList() ?? [];
+    sortedDates.sort((a, b) => b.compareTo(a)); // Sort dates in descending order
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_class.name)
+        title: Text(_class.name),
       ),
+
       body: Center(
-        child: _class.attendance == null ? const Text("No attendance taken yet") :
-        ListView.builder(
-          itemCount: _class.attendance?.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(Provider.of<Data>(context).classes[widget.classIndex].attendance!.keys.elementAt(index).toString()),
-              onTap: () {
-                DateTime dt = Provider.of<Data>(context , listen: false).classes[widget.classIndex].attendance!.keys.elementAt(index);
-                print("Show attendance");
-
-                print(Provider.of<Data>(context, listen: false).classes[widget.classIndex].attendance![dt]!);
-
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) =>ShowAttendancePage(
-                      date: dt,
-                      attendance: Provider.of<Data>(context).classes[widget.classIndex].attendance![dt]!,
+        child: _class.attendance == null
+        ? const Text("No attendance taken yet")
+        : ListView.builder(
+            itemCount: sortedDates.length,
+            itemBuilder: (context, index) {
+              DateTime dt = sortedDates[index];
+              return ListTile(
+                title: Text(_beautifyDateTime(dt)),
+                onTap: () {
+                  print("Show attendance");
+                  print(_class.attendance![dt]!);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ShowAttendancePage(
+                        date: dt,
+                        attendance: _class.attendance![dt]!,
+                      ),
                     ),
-                  )
-                );
-              },
-            );
-          },
-        ),
+                  );
+                },
+              );
+            },
+          ),
       ),
 
       floatingActionButton: ExpandableFab(
-        distance: 112,
+        distance: 80,
         children: [
           ActionButton(
             onPressed: () async {
@@ -89,18 +114,55 @@ class _ClassPageState extends State<ClassPage> {
 
               if (pickedDate != null) {
                 print(pickedDate);
-                
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => AttendancePage(
-                      classIndex: widget.classIndex,
-                      date: pickedDate,
-                      numStudents: _class.numStudents,
-                      students: _class.students!,
-                    ),
-                    maintainState: true,
-                  )
-                ).then((value) => setState(() {}));
+                  
+                if(Provider.of<Data>(context, listen: false).classes[widget.classIndex].attendanceTaken(pickedDate)){
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Confirmation'),
+                        content: Text('Do you want to override this days attendance'),
+                        actions: <Widget>[
+                          FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close the dialog
+                            },
+                            child: Text('Cancel'),
+                          ),
+                          FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close the dialog
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => AttendancePage(
+                                    numStudents: _class.numStudents,
+                                    students: _class.students!,
+                                    classIndex: widget.classIndex,
+                                    date: pickedDate,
+                                  ),
+                                ),
+                              ).then((value) => setState(() {}));
+                            },
+                            child: Text('Confirm'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                else{
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => AttendancePage(
+                        classIndex: widget.classIndex,
+                        date: pickedDate,
+                        numStudents: _class.numStudents,
+                        students: _class.students!,
+                      ),
+                      maintainState: true,
+                    )
+                  ).then((value) => setState(() {}));
+                }
               } else {
                 print("Cancelled");
               }
@@ -108,17 +170,56 @@ class _ClassPageState extends State<ClassPage> {
             icon: const Icon(Icons.calendar_month_outlined)
           ),
           ActionButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => AttendancePage(
-                  classIndex: widget.classIndex,
-                  date: DateTime.now(),
-                  numStudents: _class.numStudents,
-                  students: _class.students!,
-                ),
-                maintainState: true,
-              )
-            ).then((value) => setState(() {})),
+            onPressed: () {
+              if(Provider.of<Data>(context, listen: false).classes[widget.classIndex].attendanceTaken(DateTime.now())){
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Confirmation'),
+                      content: Text('Do you want to override this days attendance'),
+                      actions: <Widget>[
+                        FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close the dialog
+                          },
+                          child: Text('Cancel'),
+                        ),
+                        FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close the dialog
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => AttendancePage(
+                                  numStudents: _class.numStudents,
+                                  students: _class.students!,
+                                  classIndex: widget.classIndex,
+                                  date: DateTime.now(),
+                                ),
+                              ),
+                            ).then((value) => setState(() {}));
+                          },
+                          child: Text('Confirm'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }
+              else{
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => AttendancePage(
+                      classIndex: widget.classIndex,
+                      date: DateTime.now(),
+                      numStudents: _class.numStudents,
+                      students: _class.students!,
+                    ),
+                    maintainState: true,
+                  )
+                ).then((value) => setState(() {}));
+              }
+            },
             icon: const Icon(Icons.add),
           ),
         ],

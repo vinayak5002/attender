@@ -21,7 +21,14 @@ class Class {
   void saveAttendance(HashMap<String, bool> attendance, DateTime date){
     print("Saving attendance");
     print(attendance);
-    this.attendance![date] = HashMap.from(attendance);
+    
+    // save the attendance whith only the date not not including the time
+    this.attendance![DateTime(date.year, date.month, date.day)] = HashMap.from(attendance);
+  }
+
+  bool attendanceTaken(DateTime dt){
+    // check if the attendance is take while check only the date and ignoring the time
+    return attendance!.keys.any((element) => element.year == dt.year && element.month == dt.month && element.day == dt.day);
   }
 
 }
