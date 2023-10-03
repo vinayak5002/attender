@@ -210,6 +210,7 @@ class _AttendancePageState extends State<AttendancePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Provider.of<Data>(context, listen: false).classes[widget.classIndex].saveAttendance(widget.attendance, widget.date);
+          Provider.of<Data>(context, listen: false).storeData();
           Navigator.pop(context);
         },
         child: const Icon(Icons.check),

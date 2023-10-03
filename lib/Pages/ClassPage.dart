@@ -40,25 +40,30 @@ class _ClassPageState extends State<ClassPage> {
   }
 
   String _beautifyDateTime(DateTime dateTime) {
-  final now = DateTime.now();
+    final now = DateTime.now();
 
-  // Calculate the difference in days
-  final difference = now.difference(dateTime);
+    if(dateTime.isBefore(now)){
+      // Calculate the difference in days
+      final difference = now.difference(dateTime);
 
-  if (difference.inDays == 0) {
-    // Today
-    return '${DateFormat('yMMMMd').format(dateTime)} (Today)';
-  } else if (difference.inDays == 1) {
-    // Yesterday
-    return 'Yesterday';
-  } else if (difference.inDays < 7) {
-    // Within the last week
-    return DateFormat('EEEE').format(dateTime); // Format as day of the week
-  } else {
-    // More than a week ago
-    return DateFormat('yMMMMd').format(dateTime); // Format as full date
+      if (difference.inDays == 0) {
+        // Today
+        return '${DateFormat('yMMMMd').format(dateTime)} (Today)';
+      } else if (difference.inDays == 1) {
+        // Yesterday
+        return 'Yesterday';
+      } else if (difference.inDays < 7) {
+        // Within the last week
+        return DateFormat('EEEE').format(dateTime); // Format as day of the week
+      } else {
+        // More than a week ago
+        return DateFormat('yMMMMd').format(dateTime); // Format as full date
+      }
+    }
+    else{
+      return DateFormat('yMMMMd').format(dateTime); // Format as full date
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -82,15 +87,42 @@ class _ClassPageState extends State<ClassPage> {
               return ListTile(
                 title: Text(_beautifyDateTime(dt)),
                 onTap: () {
-                  print("Show attendance");
-                  print(_class.attendance![dt]!);
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => ShowAttendancePage(
                         date: dt,
                         attendance: _class.attendance![dt]!,
+                        displayDate: _beautifyDateTime(dt),
                       ),
                     ),
+                  );
+                },
+                onLongPress: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Confirmation'),
+                        content: const Text('Do you want to delete this attendance ?'),
+                        actions: <Widget>[
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close the dialog
+                            },
+                            child: const Text('Cancel'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              setState(() {
+                                Provider.of<Data>(context, listen: false).deleteAttendance(_class.name, dt);
+                              });
+                            },
+                            child: const Text('Confirm'),
+                          ),
+                        ],
+                      );
+                    },
                   );
                 },
               );
