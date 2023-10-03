@@ -120,16 +120,16 @@ class _ClassPageState extends State<ClassPage> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text('Confirmation'),
-                        content: Text('Do you want to override this days attendance'),
+                        title: const Text('Confirmation'),
+                        content: const Text('Do you want to override this days attendance'),
                         actions: <Widget>[
-                          FlatButton(
+                          ElevatedButton(
                             onPressed: () {
                               Navigator.of(context).pop(); // Close the dialog
                             },
                             child: Text('Cancel'),
                           ),
-                          FlatButton(
+                          ElevatedButton(
                             onPressed: () {
                               Navigator.of(context).pop(); // Close the dialog
                               Navigator.of(context).push(
@@ -179,13 +179,13 @@ class _ClassPageState extends State<ClassPage> {
                       title: Text('Confirmation'),
                       content: Text('Do you want to override this days attendance'),
                       actions: <Widget>[
-                        FlatButton(
+                        ElevatedButton(
                           onPressed: () {
                             Navigator.of(context).pop(); // Close the dialog
                           },
                           child: Text('Cancel'),
                         ),
-                        FlatButton(
+                        ElevatedButton(
                           onPressed: () {
                             Navigator.of(context).pop(); // Close the dialog
                             Navigator.of(context).push(

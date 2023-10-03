@@ -74,32 +74,14 @@ class _AttendancePageState extends State<AttendancePage> {
             content: sortedStudents.elementAt(_currentItemIndex),
 
             likeAction: () {
-              _scaffoldKey.currentState!.showSnackBar(
-                SnackBar(
-                  content: Text("Liked ${sortedStudents.elementAt(_currentItemIndex)}"),
-                  duration: Duration(milliseconds: 500),
-                )
-              );
               _rightSwipe();
             },
             
             nopeAction: () {
-              _scaffoldKey.currentState!.showSnackBar(
-                SnackBar(
-                  content: Text("Disliked ${sortedStudents.elementAt(_currentItemIndex)}"),
-                  duration: Duration(milliseconds: 500),
-                )
-              );
               _rightSwipe();
             },
 
             superlikeAction: () {
-              _scaffoldKey.currentState!.showSnackBar(
-                SnackBar(
-                  content: Text("Superliked ${sortedStudents.elementAt(_currentItemIndex)}"),
-                  duration: Duration(milliseconds: 500),
-                )
-              );
             },
           )
       );
@@ -132,12 +114,6 @@ class _AttendancePageState extends State<AttendancePage> {
           },
 
           superlikeAction: () {
-            _scaffoldKey.currentState!.showSnackBar(
-              SnackBar(
-                content: Text("Superliked ${sortedStudents.elementAt(i)}"),
-                duration: Duration(milliseconds: 500),
-              )
-            );
           },
 
         )
