@@ -9,12 +9,12 @@ import 'package:provider/provider.dart';
 
 class ShowAttendancePage extends StatefulWidget {
 
-  DateTime date;
-  HashMap<String, bool> attendance;
-  String displayDate;
+  final DateTime date;
+  final HashMap<String, bool> attendance;
+  final String displayDate;
 
   
- ShowAttendancePage({Key? key, required this.date, required this.attendance, required this.displayDate}) : super(key: key);
+ const ShowAttendancePage({Key? key, required this.date, required this.attendance, required this.displayDate}) : super(key: key);
 
   @override
   State<ShowAttendancePage> createState() => _ShowAttendancePageState();
