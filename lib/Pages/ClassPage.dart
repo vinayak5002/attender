@@ -10,9 +10,9 @@ import '../Models/ExpandableFAB.dart';
 import 'AttendancePage.dart';
 
 class ClassPage extends StatefulWidget {
-  int classIndex;
+  final int classIndex;
 
-  ClassPage({super.key, required this.classIndex });
+  const ClassPage({super.key, required this.classIndex });
 
   @override
   State<ClassPage> createState() => _ClassPageState();

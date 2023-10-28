@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 class AttTile extends StatefulWidget {
 
-  String roll;
+  final String roll;
   final VoidCallback attend;
 
-  AttTile({Key? key, required this.roll, required this.attend}) : super(key: key);
+  const AttTile({Key? key, required this.roll, required this.attend}) : super(key: key);
 
   @override
   State<AttTile> createState() => _AttTileState();
@@ -24,6 +24,7 @@ class _AttTileState extends State<AttTile> with AutomaticKeepAliveClientMixin {
   
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return InkWell(
       onTap: () {
         print("Tap Tap");

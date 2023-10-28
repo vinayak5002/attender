@@ -2,21 +2,18 @@
 
 import 'dart:collection';
 
-import 'package:attender/Models/AttTile.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 
 import '../Data/Data.dart';
-import '../Models/Class.dart';
 
+// ignore: must_be_immutable
 class AttendancePage extends StatefulWidget {
-  int classIndex;
-  int numStudents;
-  List<String> students;
-  DateTime date;
+  final int classIndex;
+  final int numStudents;
+  final List<String> students;
+  final DateTime date;
 
   late HashMap<String, bool> attendance;
 
@@ -43,7 +40,6 @@ class _AttendancePageState extends State<AttendancePage> {
   List<SwipeItem> _swipeItems = <SwipeItem>[];
   List<String> sortedStudents = [];
   MatchEngine? _matchEngine;
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   int _currentItemIndex = 0;
 

@@ -2,7 +2,6 @@
 import 'dart:collection';
 
 import 'package:attender/Data/Data.dart';
-import 'package:attender/Models/AttTile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
