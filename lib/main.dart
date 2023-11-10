@@ -1,3 +1,4 @@
+import 'package:attender/utils/AuthGate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -35,7 +36,8 @@ class MyApp extends StatelessWidget {
             backgroundColor: Colors.blue,
           )
         ),
-        home: const MyHomePage(title: 'Main page'),
+        // home: const AuthGate()
+        home: const AuthGate(),
       ),
     );
   }
