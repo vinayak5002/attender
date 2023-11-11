@@ -1,3 +1,4 @@
+import 'package:attender/Pages/admin/AddClass.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -27,8 +28,58 @@ class _AdminPageState extends State<AdminPage> {
         ],
       ),
 
-      body: Center(
-        child: Image.asset("assets/dash.png"),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            GridView.count(
+              crossAxisCount: 2,
+              primary: false,
+              padding: const EdgeInsets.all(20),
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              children: <Widget>[
+                Card(
+                  child: InkWell(
+                    onTap: () {
+                    },
+                    child: const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Icon(Icons.add, size: 70),
+                          Text("Add account")
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+      
+                Card(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const AddClass(),
+                        )
+                      );
+                    },
+                    child: const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Icon(Icons.add, size: 70),
+                          Text("add class")
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+
+          ],
+        ),
       ),
     );
   }
