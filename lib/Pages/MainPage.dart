@@ -1,4 +1,5 @@
 import 'package:attender/Pages/ClassPage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:provider/provider.dart';
@@ -7,9 +8,9 @@ import '../Data/Data.dart';
 
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({Key? key, required this.email}) : super(key: key);
 
-  final String title;
+  final String email;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -24,7 +25,16 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.email),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.of(context).pop();
+            },
+          )
+        ],
       ),
 
       body: Center(
