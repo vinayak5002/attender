@@ -1,7 +1,6 @@
-
-
 import 'dart:collection';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:swipe_cards/swipe_cards.dart';
@@ -37,18 +36,18 @@ class AttendancePage extends StatefulWidget {
 
 class _AttendancePageState extends State<AttendancePage> {
 
+  bool viewListMode = false;
+  bool markAllAbsent = false;
+
   List<SwipeItem> _swipeItems = <SwipeItem>[];
   MatchEngine? _matchEngine;
 
   int _currentItemIndex = 0;
 
   void _toggleAttendence(String roll){
-    print("Call back");
-    print("Roll: ${roll}");
     setState(() {
       widget.attendance[roll] = !widget.attendance[roll]!;
     });
-    print(widget.attendance);
   }
 
   void _leftSwipe(){
@@ -85,8 +84,6 @@ class _AttendancePageState extends State<AttendancePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
-
     for(int i=0; i<widget.students.length; i++) {
       _swipeItems.add(
         SwipeItem(
@@ -118,9 +115,24 @@ class _AttendancePageState extends State<AttendancePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(Provider.of<Data>(context).classes[widget.classIndex].name),
+        actions: <Widget>[
+          !viewListMode ?
+          IconButton(icon: const Icon(Icons.list), onPressed: (){
+            setState(() {
+              viewListMode = !viewListMode;
+            });
+          }) :
+          IconButton(icon: const Icon(Icons.copy), onPressed: (){
+            setState(() {
+              viewListMode = !viewListMode;
+            });
+          },),
+        ],
       ),
 
-      body: Column(
+      body: 
+      !viewListMode ?
+      Column(
         children: [
           Expanded(
             flex: 16,
@@ -137,7 +149,7 @@ class _AttendancePageState extends State<AttendancePage> {
                       color: Colors.blue,
                       child: Text(
                         _swipeItems[index].content,
-                        style: const TextStyle(fontSize: 100),
+                        style: const TextStyle(fontSize: 30),
                       ),
                     );
                   },
@@ -148,7 +160,6 @@ class _AttendancePageState extends State<AttendancePage> {
                     ));
                   },
                   itemChanged: (SwipeItem item, int index) {
-                    print("item: ${item.content}, index: $index");
                     _currentItemIndex++;
                   },
           
@@ -190,6 +201,61 @@ class _AttendancePageState extends State<AttendancePage> {
               ),
             ),
           )
+        ],
+      ) :
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CupertinoSwitch(value: markAllAbsent, onChanged: (value) {
+              setState(() {
+                markAllAbsent = value;
+              });
+              if(markAllAbsent == true){
+                setState(() {
+                  for(int i=0; i<widget.students.length; i++) {
+                    widget.attendance[widget.students.elementAt(i)] = false;
+                  }
+                });
+              }
+              else{
+                setState(() {
+                  for(int i=0; i<widget.students.length; i++) {
+                    widget.attendance[widget.students.elementAt(i)] = true;
+                  }
+                });
+              }
+            }),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: widget.students.length,
+              itemBuilder: (context, index) {
+                String roll = widget.students.elementAt(index);
+                bool att = widget.attendance[roll]!;
+                return Card(
+                  color: att ? Colors.green : Colors.redAccent,
+                  elevation: 15,
+                  margin: const EdgeInsets.all(4),
+                  child: ListTile(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    selectedTileColor: Colors.orange[100],
+                    title: Text(roll),
+                    leading: att
+                      ? const Icon(CupertinoIcons.checkmark_circle)
+                      : const Icon(CupertinoIcons.clear_circled),
+                    onTap: () {
+                      setState(() {
+                        widget.attendance[roll] = !widget.attendance[roll]!;
+                        // _attendanceModified = true;
+                      });
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
 
