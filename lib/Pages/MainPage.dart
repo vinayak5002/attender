@@ -38,54 +38,48 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
 
       body: Center(
-        child: ListView.builder(
-          itemCount: Provider.of<Data>(context).classes.length,
-          itemBuilder: (context, index){
-            return ListTile(
-              title: Text(Provider.of<Data>(context).classes[index].name),
-              subtitle: Text("Number of students: ${Provider.of<Data>(context).classes[index].numStudents}"),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => ClassPage(classIndex: index),
-                  ),
-                );
-              },
-
-              onLongPress: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Confirmation'),
-                      content: const Text('Do you want to delete this Class?'),
-                      actions: <Widget>[
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(); // Close the dialog
-                          },
-                          child: const Text('Cancel'),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: GridView.builder(
+            itemCount: Provider.of<Data>(context).classes.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, // number of items in each row
+              mainAxisSpacing: 8.0, // spacing between rows
+              crossAxisSpacing: 2.0, // spacing between columns
+            ),
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ClassPage(classIndex: index),
+                    ),
+                  );
+                },
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          Provider.of<Data>(context).classes[index].name,
+                          style: const TextStyle(fontSize: 18),
                         ),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            setState(() {
-                              Provider.of<Data>(context, listen: false).deleteClass(Provider.of<Data>(context, listen: false).classes[index].name);
-                            });
-                          },
-                          child: const Text('Confirm'),
+                        const SizedBox(height: 4,),
+                        Text(
+                          "Number of students: ${Provider.of<Data>(context).classes[index].numStudents}",
+                          style: const TextStyle(fontSize: 12),
                         ),
                       ],
-                    );
-                  },
-                );
-              },
-            );
-          },
-        ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        )
       ),
-
 
       floatingActionButton: FloatingActionButton(
         tooltip: 'Add class',
