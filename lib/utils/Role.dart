@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../Data/Data.dart';
 import '../Pages/AdminPage.dart';
 import '../Pages/MainPage.dart';
 
@@ -25,6 +27,7 @@ class _RoleGateState extends State<RoleGate> {
   void _checkUserRole() {
     getRole(widget.email).then((bool result) {
       if (result) {
+        Provider.of<Data>(context, listen: false).logInGetClasses(widget.email);
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => MyHomePage(email: widget.email),

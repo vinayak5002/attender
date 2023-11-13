@@ -147,7 +147,9 @@ class _ClassPageState extends State<ClassPage> {
               if (pickedDate != null) {
                 print(pickedDate);
                   
+                // ignore: use_build_context_synchronously
                 if(Provider.of<Data>(context, listen: false).classes[widget.classIndex].attendanceTaken(pickedDate)){
+                  // ignore: use_build_context_synchronously
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -159,7 +161,7 @@ class _ClassPageState extends State<ClassPage> {
                             onPressed: () {
                               Navigator.of(context).pop(); // Close the dialog
                             },
-                            child: Text('Cancel'),
+                            child: const Text('Cancel'),
                           ),
                           ElevatedButton(
                             onPressed: () {
@@ -167,8 +169,8 @@ class _ClassPageState extends State<ClassPage> {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) => AttendancePage(
-                                    numStudents: _class.numStudents,
-                                    students: _class.students!,
+                                    numStudents: _class.numStudents!,
+                                    students: _class.students,
                                     classIndex: widget.classIndex,
                                     date: pickedDate,
                                   ),
@@ -188,8 +190,8 @@ class _ClassPageState extends State<ClassPage> {
                       builder: (context) => AttendancePage(
                         classIndex: widget.classIndex,
                         date: pickedDate,
-                        numStudents: _class.numStudents,
-                        students: _class.students!,
+                        numStudents: _class.numStudents!,
+                        students: _class.students,
                       ),
                       maintainState: true,
                     )
@@ -223,8 +225,8 @@ class _ClassPageState extends State<ClassPage> {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => AttendancePage(
-                                  numStudents: _class.numStudents,
-                                  students: _class.students!,
+                                  numStudents: _class.numStudents!,
+                                  students: _class.students,
                                   classIndex: widget.classIndex,
                                   date: DateTime.now(),
                                 ),
@@ -244,8 +246,8 @@ class _ClassPageState extends State<ClassPage> {
                     builder: (context) => AttendancePage(
                       classIndex: widget.classIndex,
                       date: DateTime.now(),
-                      numStudents: _class.numStudents,
-                      students: _class.students!,
+                      numStudents: _class.numStudents!,
+                      students: _class.students,
                     ),
                     maintainState: true,
                   )

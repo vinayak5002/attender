@@ -5,16 +5,15 @@ import 'dart:collection';
 class Class {
 
   String name;
-  int numStudents;
-  List<String>? students;
+  int? numStudents;
+  List<String> students;
   HashMap<DateTime, HashMap<String, bool>>? attendance;
   
   Class({
     required this.name,
-    required this.numStudents
+    required this.students
   }){
-    students = List.generate(numStudents, (index) => (index+1).toString());
-
+    numStudents = students.length;
     attendance = HashMap<DateTime, HashMap<String, bool>>();
   }
 
@@ -37,9 +36,11 @@ class Class {
   }
 
   static fromMap(Map<String, dynamic> jsonData){
+    List<String> students = (jsonData["students"] as List<dynamic>).cast<String>();
+
     Class ret = Class(
       name: jsonData['name'],
-      numStudents: jsonData['numStudents']
+      students: students
     );
 
     ret.students = jsonData['students'].cast<String>();

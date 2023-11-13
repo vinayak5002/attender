@@ -151,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: ElevatedButton(
                               child: const Text("Create class"),
                               onPressed: () {
-                                Provider.of<Data>(context, listen: false).addClass(classNameController.text, numStudentsController);
+                                // Provider.of<Data>(context, listen: false).addClass(classNameController.text, numStudentsController);
                                 
                                 classNameController.clear();
                                 numStudentsController = 1;
