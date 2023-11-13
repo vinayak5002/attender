@@ -42,11 +42,10 @@ class Data extends ChangeNotifier {
 
     // check if any new classes have been added
     classNames.forEach((key, value) {
-      // if(! classes.any((element) => element.name == key)){
-      //   classes.add(Class(name: key, students: value));
-      //   print("Class getting added");
-      // }
-      print(key);
+      if(! classes.any((element) => element.name == key)){
+        classes.add(Class(name: key, students: value));
+        print("Class getting added");
+      }
     });
     classes.forEach(((element) => print(element.name)));
 

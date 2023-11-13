@@ -92,6 +92,7 @@ class _ClassPageState extends State<ClassPage> {
                       builder: (context) => ShowAttendancePage(
                         date: dt,
                         attendance: _class.attendance![dt]!,
+                        students: _class.students,
                         displayDate: _beautifyDateTime(dt),
                       ),
                     ),

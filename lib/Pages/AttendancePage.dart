@@ -38,7 +38,6 @@ class AttendancePage extends StatefulWidget {
 class _AttendancePageState extends State<AttendancePage> {
 
   List<SwipeItem> _swipeItems = <SwipeItem>[];
-  List<String> sortedStudents = [];
   MatchEngine? _matchEngine;
 
   int _currentItemIndex = 0;
@@ -53,12 +52,12 @@ class _AttendancePageState extends State<AttendancePage> {
   }
 
   void _leftSwipe(){
-    String studentName = sortedStudents.elementAt(_currentItemIndex);
+    String studentName = widget.students.elementAt(_currentItemIndex);
     widget.attendance[studentName] = false;
   }
 
   void _rightSwipe(){
-    String studentName = sortedStudents.elementAt(_currentItemIndex);
+    String studentName = widget.students.elementAt(_currentItemIndex);
     widget.attendance[studentName] = true;
   }
 
@@ -67,7 +66,7 @@ class _AttendancePageState extends State<AttendancePage> {
     setState(() {
       _swipeItems.insert(0, 
           SwipeItem(
-            content: sortedStudents.elementAt(_currentItemIndex),
+            content: widget.students.elementAt(_currentItemIndex),
 
             likeAction: () {
               _rightSwipe();
@@ -88,18 +87,10 @@ class _AttendancePageState extends State<AttendancePage> {
   void initState() {
     // TODO: implement initState
 
-    sortedStudents = widget.attendance.keys.toList();
-    sortedStudents.sort((a, b) {
-      int numA = int.tryParse(a) ?? 0; // Convert string to integer or use 0 if not a valid number
-      int numB = int.tryParse(b) ?? 0;
-
-      return numA - numB; // Compare as numbers
-    });
-
-    for(int i=0; i<sortedStudents.length; i++) {
+    for(int i=0; i<widget.students.length; i++) {
       _swipeItems.add(
         SwipeItem(
-          content: sortedStudents.elementAt(i),
+          content: widget.students.elementAt(i),
 
           likeAction: () {
             _rightSwipe();

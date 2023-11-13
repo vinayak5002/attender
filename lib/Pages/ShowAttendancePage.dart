@@ -10,11 +10,12 @@ import 'package:provider/provider.dart';
 class ShowAttendancePage extends StatefulWidget {
 
   final DateTime date;
+  final List<String> students;
   final HashMap<String, bool> attendance;
   final String displayDate;
 
   
- const ShowAttendancePage({Key? key, required this.date, required this.attendance, required this.displayDate}) : super(key: key);
+ const ShowAttendancePage({Key? key, required this.date, required this.attendance, required this.displayDate, required this.students}) : super(key: key);
 
   @override
   State<ShowAttendancePage> createState() => _ShowAttendancePageState();
@@ -28,21 +29,16 @@ class _ShowAttendancePageState extends State<ShowAttendancePage> {
   @override
   Widget build(BuildContext context) {
     List<String> sortedStudents = widget.attendance.keys.toList();
-    sortedStudents.sort((a, b) {
-      int numA = int.tryParse(a) ?? 0; // Convert string to integer or use 0 if not a valid number
-      int numB = int.tryParse(b) ?? 0;
-
-      return numA - numB; // Compare as numbers
-    });
+    sortedStudents.sort();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.displayDate),
       ),
       body: Center(
         child: ListView.builder(
-          itemCount: widget.attendance.values.length,
+          itemCount: widget.students.length,
           itemBuilder: (context, index) {
-            String roll = sortedStudents.elementAt(index);
+            String roll = widget.students.elementAt(index);
             bool att = widget.attendance[roll]!;
             return Card(
               color: att ? Colors.green : Colors.redAccent,
