@@ -1,8 +1,16 @@
+import 'dart:collection';
+import 'dart:io';
+
 import 'package:attender/Pages/ShowAttendancePage.dart';
+import 'package:attender/utils/FileStorage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:syncfusion_flutter_xlsio/xlsio.dart';
+
+import 'package:path_provider/path_provider.dart';
 
 import '../Data/Data.dart';
 import '../Models/Class.dart';
@@ -65,6 +73,80 @@ class _ClassPageState extends State<ClassPage> {
     }
   }
 
+  void exportAttendence(){
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Export'),
+            content: const Text('Export attendance'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: const Text('All'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final Workbook workbook = Workbook();
+                  Worksheet sheet = workbook.worksheets[0];
+
+                  List<String> stds = Provider.of<Data>(context, listen: false).classes[widget.classIndex].students;
+
+                  for (int i = 0; i < stds.length; i++) {
+                    sheet.getRangeByIndex(i + 1, 1).setText(stds[i]);
+                  }
+
+                  HashMap<DateTime, HashMap<String, bool>> att = Provider.of<Data>(context, listen: false).classes[widget.classIndex].attendance ?? HashMap<DateTime, HashMap<String, bool>>();
+
+                  att.keys.toList().forEach((element) {
+                    if (DateUtils.isSameDay(element, DateTime.now())) {
+                      for (int i = 0; i < stds.length; i++) {
+                        sheet.getRangeByIndex(i + 1, 2).setText(att[element]![stds[i]] == true ? "P" : "A");
+                      }
+                    }
+                  });
+
+                  String filename = DateTime.now().toString() + Provider.of<Data>(context, listen: false).classes[widget.classIndex].name;
+
+                  //ask for permission
+                  await Permission.manageExternalStorage.request();
+                  var status = await Permission.manageExternalStorage.status;
+                  if (status.isDenied) {
+                    // We didn't ask for permission yet or the permission has been denied   before but not permanently.
+                    return;
+                  }
+
+                  // You can can also directly ask the permission about its status.
+                  if (await Permission.storage.isRestricted) {
+                    // The OS restricts access, for example because of parental controls.
+                    return;
+                  }
+                  if (status.isGranted) {
+                  //here you add the code to store the file
+
+                    Directory? directory = await getDownloadsDirectory();
+                    // String filePath = '${directory?.path}/$filename.xlsx';
+                    String filePath = '/storage/emulated/0/Download/$filename.xlsx';
+
+                    // Save the file
+                    final List<int> bytes = workbook.saveAsStream();
+                    // FileStorage.writeCounter(bytes.toString(), filename);
+                    await File(filePath).writeAsBytes(bytes);
+
+                    print("File saved at: $filePath");
+                  }
+                  workbook.dispose();
+                },
+                child: const Text('Todays'),
+              ),
+            ],
+          );
+        },
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
     Class _class = Provider.of<Data>(context).classes[widget.classIndex];
@@ -75,6 +157,14 @@ class _ClassPageState extends State<ClassPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_class.name),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.download_done_outlined),
+            onPressed: (() {
+              exportAttendence();
+            }),
+          )
+        ],
       ),
 
       body: Center(
