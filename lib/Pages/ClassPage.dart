@@ -6,6 +6,7 @@ import 'package:attender/utils/FileStorage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
@@ -82,12 +83,6 @@ class _ClassPageState extends State<ClassPage> {
             content: const Text('Export attendance'),
             actions: <Widget>[
               ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                child: const Text('All'),
-              ),
-              ElevatedButton(
                 onPressed: () async {
                   final Workbook workbook = Workbook();
                   Worksheet sheet = workbook.worksheets[0];
@@ -108,7 +103,7 @@ class _ClassPageState extends State<ClassPage> {
                     }
                   });
 
-                  String filename = DateTime.now().toString() + Provider.of<Data>(context, listen: false).classes[widget.classIndex].name;
+                  String filename = DateTime.now().toString();
 
                   //ask for permission
                   await Permission.manageExternalStorage.request();
@@ -124,20 +119,41 @@ class _ClassPageState extends State<ClassPage> {
                     return;
                   }
                   if (status.isGranted) {
-                  //here you add the code to store the file
 
-                    Directory? directory = await getDownloadsDirectory();
-                    // String filePath = '${directory?.path}/$filename.xlsx';
-                    String filePath = '/storage/emulated/0/Download/$filename.xlsx';
+                    Directory? downloadsDirectory = await getExternalStorageDirectory();
 
-                    // Save the file
-                    final List<int> bytes = workbook.saveAsStream();
-                    // FileStorage.writeCounter(bytes.toString(), filename);
-                    await File(filePath).writeAsBytes(bytes);
+                    Directory? _path = await getExternalStorageDirectory(); 
+                    String _localPath = _path!.path + Platform.pathSeparator + Provider.of<Data>(context, listen: false).classes[widget.classIndex].name;
+                    final savedDir = Directory(_localPath);
+                    bool hasExisted = await savedDir.exists();
+                    if (!hasExisted) {
+                        savedDir.create();
+                    }
+                    String headPath = _localPath;
 
-                    print("File saved at: $filePath");
+                    if (downloadsDirectory != null) {
+                      String filePath = '${headPath}/$filename.xlsx';
+
+                      File file = File(filePath);
+                      final List<int> bytes = workbook.saveAsStream();
+                      await file.writeAsBytes(bytes);
+
+                      print("File saved at: $filePath");
+                      bool fileExists = await File(filePath).exists();
+                      if (fileExists) {
+                        OpenFile.open(filePath);
+                      } else {
+                        print('File does not exist.');
+                      }
+                    } else {
+                      print("Unable to access the downloads directory");
+                    }
+
+
                   }
                   workbook.dispose();
+                  Navigator.of(context).pop();
+                  return;
                 },
                 child: const Text('Todays'),
               ),
@@ -159,7 +175,7 @@ class _ClassPageState extends State<ClassPage> {
         title: Text(_class.name),
         actions: [
           IconButton(
-            icon: Icon(Icons.download_done_outlined),
+            icon: Icon(Icons.download),
             onPressed: (() {
               exportAttendence();
             }),
@@ -195,8 +211,7 @@ class _ClassPageState extends State<ClassPage> {
                       return AlertDialog(
                         title: const Text('Confirmation'),
                         content: const Text('Do you want to delete this attendance ?'),
-                        actions: <Widget>[
-                          ElevatedButton(
+                        actions: <Widget>[ElevatedButton(
                             onPressed: () {
                               Navigator.of(context).pop(); // Close the dialog
                             },
